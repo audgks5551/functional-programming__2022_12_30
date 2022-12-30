@@ -146,3 +146,16 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
   Stream<T> filter(Predicate<? super T> predicate);    
 }
 ```
+
+## Map
+- 데이터 변형
+- 데이터에 해당 함수가 적용된 결과물을 제공하는 stream 을 리턴
+
+```java
+import java.util.stream.BaseStream;
+
+@FunctionalInterface
+public interface Stream<T> extends BaseStream<T, Stream<T>> {
+    <R> Stream<R> map(Function<? super T, ? extends R> mapper);
+}
+```
