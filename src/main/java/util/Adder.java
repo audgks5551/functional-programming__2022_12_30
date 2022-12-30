@@ -12,7 +12,7 @@ public class Adder implements Function<Integer, Integer> {
     }
 }
 
-class Main {
+class AdderMain {
     public static void main(String[] args) {
         // 객체를 함수로서 선언한다.
         Function<Integer, Integer> functionAdder = new Adder();
