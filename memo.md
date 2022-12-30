@@ -38,3 +38,17 @@ public interface Function<T, R> {
     }
 }
 ```
+
+## functional interface 종류
+## Supplier 
+- 공급하는 인터페이스
+- 아낌없이 주는 나무
+- input 없이 return 값만 있다.
+```java
+@FunctionalInterface
+public interface Supplier<T> {
+    T get();
+}
+```
+> 실제로 어디서 사용할까??
+> 실제 예제나 있나??
