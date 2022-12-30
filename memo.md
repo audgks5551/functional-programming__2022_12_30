@@ -71,3 +71,40 @@ public interface BiConsumer<T, U> {
     void accept(T t, U u);
 }
 ```
+
+### 4. Predicate
+- 진실 혹은 거짓
+```java
+@FunctionalInterface
+public interface Predicate<T> {
+    boolean test(T t);
+
+    default Predicate<T> and(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) && other.test(t);
+    }
+    
+    default Predicate<T> negate() {
+        return (t) -> !test(t);
+    }
+    
+    default Predicate<T> or(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) || other.test(t);
+    }
+    
+    static <T> Predicate<T> isEqual(Object targetRef) {
+        return (null == targetRef)
+                ? Objects::isNull
+                : object -> targetRef.equals(object);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> Predicate<T> not(Predicate<? super T> target) {
+        Objects.requireNonNull(target);
+        return (Predicate<T>)target.negate();
+    }
+}
+```
+- and 메서드 경우 `(T t) -> test(t) && other.test(t);` 라고 표현할 수 있다
+- 즉, T 타입의 새로운 함수를 만들어 반환하는 것이다.
