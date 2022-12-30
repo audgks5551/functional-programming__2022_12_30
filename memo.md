@@ -62,3 +62,12 @@ public interface Consumer<T> {
     void accept(T t);
 }
 ```
+### 3. BiConsumer
+- 더 먹보
+- input 2개를 받기만하고 return 값이 없다.
+```java
+@FunctionalInterface
+public interface BiConsumer<T, U> {
+    void accept(T t, U u);
+}
+```
