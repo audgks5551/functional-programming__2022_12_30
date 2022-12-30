@@ -135,3 +135,14 @@ public interface Comparator<T> {
 
 ## Stream
 - 시내, 흐름
+
+## Filter
+- 거름종이 같은 필터
+- 만족하는 데이터만 걸러내는데 사용
+- Predicate 에 true 를 반환하는 데이터만 존재하는 stream 을 리턴
+```java
+@FunctionalInterface
+public interface Stream<T> extends BaseStream<T, Stream<T>> {
+  Stream<T> filter(Predicate<? super T> predicate);    
+}
+```
