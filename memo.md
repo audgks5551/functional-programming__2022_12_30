@@ -108,3 +108,12 @@ public interface Predicate<T> {
 ```
 - and 메서드 경우 `(T t) -> test(t) && other.test(t);` 라고 표현할 수 있다
 - 즉, T 타입의 새로운 함수를 만들어 반환하는 것이다.
+
+### 5. Comparator
+- 비교를 위한 인터페이스
+```java
+@FunctionalInterface
+public interface Comparator<T> {
+    int compare(T o1, T o2);
+}
+```
