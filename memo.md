@@ -40,7 +40,7 @@ public interface Function<T, R> {
 ```
 
 ## functional interface 종류
-## Supplier 
+### 1. Supplier 
 - 공급하는 인터페이스
 - 아낌없이 주는 나무
 - input 없이 return 값만 있다.
@@ -52,3 +52,13 @@ public interface Supplier<T> {
 ```
 > 실제로 어디서 사용할까??
 > 실제 예제나 있나??
+
+### 2. Consumer
+- 먹보
+- input 으로 받기만 하고 return 값이 없다
+```java
+@FunctionalInterface
+public interface Consumer<T> {
+    void accept(T t);
+}
+```
