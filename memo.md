@@ -132,3 +132,6 @@ public interface Comparator<T> {
   - 객체의 instance method 를 지정할 때
 - ClassName:new
   - 클래스의 constructor 를 지정할 때
+
+## Stream
+- 시내, 흐름
