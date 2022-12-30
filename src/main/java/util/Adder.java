@@ -1,6 +1,7 @@
 package util;
 
 import java.util.function.Function;
+import java.util.function.BiFunction;
 
 // 객체를 함수화 하는 과정
 public class Adder implements Function<Integer, Integer> {
@@ -27,5 +28,11 @@ class Main {
         int result2 = functionAdder2.apply(5);
         System.out.println(result2);
         // 어? 클래스를 만들지 않아도 객체를 함수로 만들 수 있네!!
+
+        // 매개변수를 두개 받는 건 어떻게 하지??
+        // BiFunction 을 구현해보자!!
+        BiFunction<Integer, Integer, Integer> functionAdd = (x, y) -> x + y;
+        int result3 = functionAdd.apply(10, 20);
+        System.out.println(result3);
     }
 }
