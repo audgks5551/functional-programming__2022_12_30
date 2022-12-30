@@ -71,5 +71,10 @@ public class Chapter5Section1 {
 
         printUserField(users, user -> user.getId());
         printUserField(users, User::getName);
+
+        User user = new User(3, "mark");
+        BiFunction<Integer, String, User> functionUserCreator = User::new;
+
+        System.out.println(functionUserCreator.apply(3, "mark"));
     }
 }
