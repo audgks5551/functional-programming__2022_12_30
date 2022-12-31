@@ -1,0 +1,74 @@
+<script>
+    var shopping_cart = []; // 액션
+    var shopping_cart_total = 0; // 액션
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    function calc_total(cart) {
+        var total = 0;
+        for (var i = 0; i < cart.length; i++) {
+            var item = cart[i];
+            total += item.price;
+        }
+        return total;
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    function add_item(cart, name, price) {
+        var new_cart = cart.slice();
+        new_cart.push({
+            name: name,
+            price: price,
+        })
+        return new_cart;
+    }
+
+    // 계산
+    function calc_tax(amount) {
+        return amount * 0.10
+    }
+
+    // 계산
+    function gets_free_shipping(cart_total, price) {
+        return price + cart_total >= 20
+    }
+
+    // 액션
+    function add_to_total(amount) {
+        console.log("Old total: " + total); // 액션, 출력
+        total += amount; // 액션, 출력
+        return total; // 액션, 출력
+    }
+
+    // 액션
+    function add_item_to_cart(name, price) {
+        shopping_cart = add_item(shopping_cart, name, price); // 액션, 출력
+        calc_cart_total(); // 액션
+    }
+
+    // 액션
+    function calc_cart_total() {
+        shopping_cart_total = calc_total(shopping_cart); // 액션, 출력
+        set_cart_total_dom(); // 액션
+        update_shipping_icons(); // 액션
+        update_tax_dom(); // 액션
+    }
+
+    // 액션
+    function update_shipping_icons() {
+        var buy_buttons = get_buy_buttons_dom(); // 액션
+        for (var i = 0; i < buy_buttons.length; i++) {
+            var button = buy_buttons[i];
+            var item = button.item;
+            if (calc_shipping_free(shopping_cart_total, item.price)) {
+                button.show_free_shopping_icon(); // 액션
+            } else {
+                button.hide_free_shhopping_icon(); // 액션
+            }
+        }
+    }
+
+    // 액션
+    function update_tax_dom() {
+        set_tax_dom(calc_tax(shopping_cart_total)); // 액션
+    }
+</script>
