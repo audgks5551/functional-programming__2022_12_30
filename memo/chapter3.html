@@ -74,20 +74,20 @@
 
     // 액션
     function sendIssue() {
-        var coupons = fetchCouponsFromDB();
-        var goodCoupons = selectCouponseByRank(coupons, "good");
-        var bestCoupons = selectCouponsByRank(coupons, "best");
+        var coupons = fetchCouponsFromDB(); // 액션
+        var goodCoupons = selectCouponseByRank(coupons, "good"); // 계산
+        var bestCoupons = selectCouponsByRank(coupons, "best"); // 계산
 
         var page = 0;
-        var subscribers = fetchSubscribersFromDB(page);
+        var subscribers = fetchSubscribersFromDB(page); // 액션
         while (subscribers.length > 0) {
-            var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons);
+            var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산
             for (var e = 0; e < emails.length; e++) {
                 var email = emails[e];
-                emailSystem.send(email);
+                emailSystem.send(email); // 액션
             }
             page++;
-            subscribers = fetchSubscribersFromDB(page);
+            subscribers = fetchSubscribersFromDB(page); // 액션
         }
     }
 </script>
