@@ -1,0 +1,93 @@
+<script>
+    // 데이터
+    var subscriber = {
+        email: "sam@pmail.com",
+        rec_count: 16,
+    }
+
+    // 데이터
+    var coupon = {
+        code: "10PERCENT",
+        rank: "bad",
+    }
+
+    // 데이터
+    var rank1 = "best";
+    var rank2 = "good";
+
+    // 계산
+    function subCouponRank(subscriber) {
+        if (subscriber.rec_count >= 10)
+            return "best";
+        else
+            return "good";
+    }
+
+    // 계산
+    function selectCouponsByRank(coupons, rank) {
+        var ret = [];
+        for(var c = 0; c < coupons.length; c++) {
+            var coupon = coupons[c];
+            if (coupon.rank == rank)
+                ret.push(coupon.code)
+        }
+        return ret;
+    }
+
+    // 데이터
+    var message = {
+        from: "newsletter@coupondog.co",
+        to: "sma@pmail.com",
+        subject: "Your weekly coupons inside",
+        body: "Here are your coupons"
+    }
+
+    // 계산
+    function emailForSubscriber(subscriber, goods, bests) {
+        var rank = subCouponRank(subscriber);
+        if (rank === "best")
+            return {
+                from: "newsletter@coupondog.co",
+                to: "sma@pmail.com",
+                subject: "Your weekly coupons inside",
+                body: "Here are your coupons: " + bests.join(", ")
+            };
+        else
+            return {
+                from: "newsletter@coupondog.co",
+                to: "sma@pmail.com",
+                subject: "Your weekly coupons inside",
+                body: "Here are your coupons: " + goods.join(", ")
+            };
+    }
+
+    // 계산
+    function emailsForSubscribers(subscribers, goods, bests) {
+        var emails = []
+        for (var s = 0; s < subscribers.length; s++) {
+            var subscriber = subscribers[s];
+            var email = emailForSubscriber(subscriber, goods, bests);
+            emails.push(email);
+        }
+        return emails;
+    }
+
+    // 액션
+    function sendIssue() {
+        var coupons = fetchCouponsFromDB();
+        var goodCoupons = selectCouponseByRank(coupons, "good");
+        var bestCoupons = selectCouponsByRank(coupons, "best");
+
+        var page = 0;
+        var subscribers = fetchSubscribersFromDB(page);
+        while (subscribers.length > 0) {
+            var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons);
+            for (var e = 0; e < emails.length; e++) {
+                var email = emails[e];
+                emailSystem.send(email);
+            }
+            page++;
+            subscribers = fetchSubscribersFromDB(page);
+        }
+    }
+</script>
