@@ -1,0 +1,221 @@
+<script>
+    o["price"] = 37;
+
+    function objectSet(object, key, value) {
+        var object_copy = Object.assign({}, object);
+        object_copy[key] = value;
+        return object_copy;
+    }
+
+    function setPrice(item, new_price) {
+        return objectSet(item, "price", new_price);
+    }
+
+    function setQuantity(item, new_quantity) {
+        return objectSet(item, "quantity", new_quantity);
+    }
+
+    var a = {x : 1};
+    delete a["x"];
+
+    function objectDelete(object, key) {
+        var copy = object.assign({}, object);
+        delete copy[key];
+        return copy;
+    }
+
+    function setPriceByName(cart, name, price) {
+        var cart_copy = cart.slice();
+        for (var i = 0; i < cart_copy.length; i++) {
+            if (cart_copy[i].name === name) {
+                cart_copy[name] = setPrice(cart_copy[i], price)
+            }
+        }
+        return cart_copy;
+    }
+</script>
+<script>
+    var a = [1, 2, 3, 4];
+    var b = a.shift();
+
+    console.log(b) // 1
+    console.log(a) // 2, 3, 4
+
+    function first_element(array) {
+        return array[0]
+    }
+
+    function drop_first(array) {
+        var copy = array.slice();
+        copy.shift();
+        return copy;
+    }
+
+    function shift(array) {
+        var array_copy = array.slice();
+        var first = array_copy.shift();
+
+        return {
+            first: first,
+            array: array_copy,
+        };
+    }
+
+    function shift2(array) {
+        return {
+            first: first_element(array),
+            array: drop_first(array),
+        }
+    }
+
+    var a1 = [1, 2, 3, 4];
+    var b1 = a.pop();
+    console.log(b1) // 4
+    console.log(a1) // 1, 2, 3
+
+    var a2 = last_element(a1);
+    var b2 = drop_last(a1);
+
+    function last_element(array) {
+        return array[-1]
+    }
+
+    function drop_last(array) {
+        var array_copy = array.slice();
+        array_copy.pop();
+        return array_copy;
+    }
+
+    function pop(array) {
+        var array_copy = array.slice()
+        var last_element = array_copy.pop();
+
+        return {
+            last: last_element,
+            array: array_copy,
+        }
+    }
+</script>
+<script>
+    var mailing_list = [];
+
+    function add_contact(mailing_list, email) {
+        var copy = mailing_list.slice();
+        copy.push(email);
+        return copy;
+    }
+
+    function submit_form_handler(event) {
+        var form = event.target;
+        var email = form.elements["email"].value;
+        mailing_list = add_contact(mailing_list, email);
+    }
+</script>
+<script>
+    var shopping_cart = []; // 액션
+
+    function delete_handler(name) {
+
+        shopping_cart = remove_item_by_name(shopping_cart, name);
+        var total = calc_total(shopping_cart);
+        set_cart_total_dom(total);
+        update_shipping_icons(shopping_cart);
+        update_tax_dom(total);
+    }
+
+    function removeItems(array, idx, count) {
+        var copy = array.slice();
+        copy.splice(idx, count);
+        return copy;
+    }
+
+    function remove_item_by_name(cart, name) {
+        var new_cart = cart.slice();
+        var idx = null;
+        for (var i = 0; i < new_cart.length; i++) {
+            if (new_cart[i].name === name)
+                idx = i;
+        }
+
+        if (idx !== null)
+            return removeItems(new_cart, idx, 1);
+
+        return new_cart;
+    }
+
+    // 액션
+    function add_item_to_cart(name, price) {
+        var item = make_cart_item(name, price);
+        shopping_cart = add_item(shopping_cart, item); // 액션, 입력, 출력
+        var total = calc_total(shopping_cart); // 액션
+        set_cart_total_dom(); // 액션
+        update_shipping_icons(shopping_cart); // 액션
+        update_tax_dom(total); // 액션
+    }
+
+    // 액션
+    function update_shipping_icons(cart) {
+        var buy_buttons = get_buy_buttons_dom(); // 액션
+        for (var i = 0; i < buy_buttons.length; i++) {
+            var button = buy_buttons[i];
+            var item = button.item;
+            var newItem = add_item(cart, item.name, item.price)
+            if (gets_free_shipping(newItem)) {
+                button.show_free_shopping_icon(); // 액션
+            } else {
+                button.hide_free_shhopping_icon(); // 액션
+            }
+        }
+    }
+
+    // 액션
+    function update_tax_dom(total) {
+        set_tax_dom(calc_tax(total)); // 액션, 출력
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // cart, item 동작 and 비즈니스 규칙
+    function calc_total(cart) {
+        var total = 0;
+        for (var i = 0; i < cart.length; i++) {
+            var item = cart[i];
+            total += item.price;
+        }
+        return total;
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // cart 동작
+    function add_item(cart, item) {
+        return add_element_last(cart, item)
+    }
+
+    // 계산
+    // 배열 유틸리티
+    function add_element_last(array, elem) {
+        var new_array = array.slice();
+        new_array.push(elem)
+        return new_array;
+    }
+
+    // 계산
+    // item 동작
+    function make_cart_item(name, price) {
+        return {
+            name: name,
+            price: price,
+        }
+    }
+
+    // 계산
+    // 비즈니스 규칙
+    function calc_tax(amount) {
+        return amount * 0.10
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // 비즈니스 규칙
+    function gets_free_shipping(cart) {
+        return calc_total(cart) >= 20
+    }
+</script>
