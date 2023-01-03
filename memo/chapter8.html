@@ -1,0 +1,155 @@
+<script>
+    var shopping_cart = []; // 액션
+
+    function arraySet(array, idx, value) {
+        var copy = array.slice();
+        copy[idx] = value;
+        return copy;
+    }
+
+    function setPriceByName(cart, name, price) {
+        var index = indexOfItem(cart, name);
+
+        if (index !== null) {
+            var item = arrayGet(cart, index)
+            return arraySet(cart, index, setPrice(item, name));
+
+        }
+        return cartCopy;
+    }
+
+    function arrayGet(array, index) {
+        return array[index];
+    }
+
+    function isInCart(cart, name) {
+        return indexOfItem(cart, name) !== null
+    }
+
+    function freeTieClip(cart) {
+        var hasTie = isInCart(cart, "tie");
+        var hasTieClip = isInCart(cart, "tie clip");
+
+        if (hasTie && !hasTieClip) {
+            var tieClip = make_item("tie clip", 0);
+            return add_item(cart, tieClip);
+        }
+        return cart;
+    }
+
+    function delete_handler(name) {
+
+        shopping_cart = remove_item_by_name(shopping_cart, name);
+        var total = calc_total(shopping_cart);
+        set_cart_total_dom(total);
+        update_shipping_icons(shopping_cart);
+        update_tax_dom(total);
+    }
+
+    function removeItems(array, idx, count) {
+        var copy = array.slice();
+        copy.splice(idx, count);
+        return copy;
+    }
+
+    function indexOfItem(cart, name) {
+        for (var i = 0; i < cart.length; i++) {
+            if (cart[i].name === name)
+                return i;
+        }
+        return null;
+    }
+
+    function remove_item_by_name(cart, name) {
+        var new_cart = cart.slice();
+        var idx = indexOfItem(new_cart, name);
+
+        if (idx !== null)
+            return removeItems(new_cart, idx, 1);
+
+        return new_cart;
+    }
+
+    function black_friday_promotion_safe(shopping_cart) {
+        var cart_copy = deepCopy(shopping_cart);
+        black_friday_promotion(cart_copy);
+        return deepCopy(cart_copy);
+    }
+
+    // 액션
+    function add_item_to_cart(name, price) {
+        var item = make_item(name, price);
+        shopping_cart = add_item(shopping_cart, item); // 액션, 입력, 출력
+        var total = calc_total(shopping_cart); // 액션
+        set_cart_total_dom(); // 액션
+        update_shipping_icons(shopping_cart); // 액션
+        update_tax_dom(total); // 액션
+        black_friday_promotion_safe(shopping_cart);
+    }
+
+    // 액션
+    function update_shipping_icons(cart) {
+        var buy_buttons = get_buy_buttons_dom(); // 액션
+        for (var i = 0; i < buy_buttons.length; i++) {
+            var button = buy_buttons[i];
+            var item = button.item;
+            var newItem = add_item(cart, item.name, item.price)
+            if (gets_free_shipping(newItem)) {
+                button.show_free_shopping_icon(); // 액션
+            } else {
+                button.hide_free_shhopping_icon(); // 액션
+            }
+        }
+    }
+
+    // 액션
+    function update_tax_dom(total) {
+        set_tax_dom(calc_tax(total)); // 액션, 출력
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // cart, item 동작 and 비즈니스 규칙
+    function calc_total(cart) {
+        var total = 0;
+        for (var i = 0; i < cart.length; i++) {
+            var item = cart[i];
+            total += item.price;
+        }
+        return total;
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // cart 동작
+    function add_item(cart, item) {
+        return add_element_last(cart, item)
+    }
+
+    // 계산
+    // 배열 유틸리티
+    function add_element_last(array, elem) {
+        var new_array = array.slice();
+        new_array.push(elem)
+        return new_array;
+    }
+
+    // 계산
+    // item 동작
+    function make_item(name, price) {
+        return {
+            name: name,
+            price: price,
+        }
+    }
+
+    // 계산
+    // 비즈니스 규칙
+    function calc_tax(amount) {
+        return amount * 0.10
+    }
+
+    // 계산, 아직 인자가 불변이 아니다 그래서 불변으로 가정
+    // 비즈니스 규칙
+    function gets_free_shipping(cart) {
+        return calc_total(cart) >= 20
+    }
+</script>
