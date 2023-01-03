@@ -33,6 +33,16 @@
         }
         return cart_copy;
     }
+
+    function setQuantityByName(cart, name, quantity) {
+        var cart_copy = cart.slice();
+        for (var i = 0; i < cart_copy.length; i++) {
+            if (cart_copy[i].name === name) {
+                cart_copy[i] = objectSet(cart_copy[i], "quantity", quantity)
+            }
+        }
+        return cart_copy;
+    }
 </script>
 <script>
     var a = [1, 2, 3, 4];
