@@ -1,0 +1,37 @@
+<script>
+    function subCouponRank(subscriber) {
+        if (subscriber.rec_count >= 10)
+            return "best";
+        else
+            return "good";
+    }
+
+    function emailForCustomer(subscriber, goods, bests) {
+        var rank = subCouponRank(subscriber);
+        if (rank === "best")
+            return {
+                from: "newsletter@coupondog.co",
+                to: "sma@pmail.com",
+                subject: "Your weekly coupons inside",
+                body: "Here are your coupons: " + bests.join(", ")
+            };
+        else
+            return {
+                from: "newsletter@coupondog.co",
+                to: "sma@pmail.com",
+                subject: "Your weekly coupons inside",
+                body: "Here are your coupons: " + goods.join(", ")
+            };
+    }
+
+    // 계산
+    function emailForCustomers(customers, goods, bests) {
+        var emails = [];
+        for (var i = 0; i < customers.length; i++) {
+            var customer = customers[i];
+            var email = emailForCustomer(customer, goods, bests);
+            emails.push(email);
+        }
+        return emails;
+    }
+</script>

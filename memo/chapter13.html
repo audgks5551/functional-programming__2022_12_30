@@ -1,0 +1,23 @@
+<script>
+    function shoesAndSocksInventory(products) {
+        var shoesAndSocksProducts = filter(products, function (product) {
+            product.type === "shoes" || product.type === "socks"
+        });
+
+        var inventories = map(shoesAndSocksProducts, function (product) {
+            return product.numberInInventory;
+        });
+
+        return reduce(inventories, 0, plus);
+    }
+</script>
+<script>
+    function filter(array, f) {
+        var newArray = [];
+        forEach(array, function (element) {
+            if (f(element))
+                newArray
+        })
+    }
+    var itemAdded = ["shirt", "shoes", "shirt", "socks", "hat"]
+</script>
