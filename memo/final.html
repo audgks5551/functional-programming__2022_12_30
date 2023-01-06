@@ -143,8 +143,22 @@
             }
 
             // 액션
-            function fetchSubscribersFromDB() {
-                return [subscriber1, subscriber2, subscriber3, subscriber4, subscriber5, subscriber6];
+            function fetchSubscribersFromDB(page) {
+                var returnList = [];
+
+                if (page === 6) {
+                    return returnList;
+                }
+
+                var list = [subscriber1, subscriber2, subscriber3, subscriber4, subscriber5, subscriber6];
+
+                for (var s = page; s < page + 1; s++) {
+
+
+                    returnList.push(list[s]);
+                }
+
+                return returnList;
             }
 
             // 액션
@@ -177,17 +191,24 @@
 
             // 액션들의 묶음도 액션
             function sendIssue() {
-                var subscribers = fetchSubscribersFromDB(); // 액션
+                var page = 0;
+                var subscribers = fetchSubscribersFromDB(page); // 액션
 
                 var coupons = fetchCouponsFromDB(); // 액션
                 var bestCoupons = selectCouponsByRank(coupons, BestRank); // 계산
                 var goodCoupons = selectCouponsByRank(coupons, GoodRank); // 계산
 
-                var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산
+                while (subscribers.length > 0) {
+                    var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산
 
-                for (var e = 0; e < emails.length; e++) {
-                    var email = emails[e];
-                    emailSystem.send(email); // 액션
+                    for (var e = 0; e < emails.length; e++) {
+                        var email = emails[e];
+                        emailSystem.send(email); // 액션
+                    }
+
+                    page++;
+                    subscribers = fetchSubscribersFromDB(page);
+                    console.log(subscribers)
                 }
             }
 
