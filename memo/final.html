@@ -1,0 +1,197 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <script>
+            /**
+             * 구독자 데이터
+             *  - email : 이메일 주소
+             *  - rec_count : 추천을 받은 수
+             */
+            var subscriber1 = {
+                email: "john@coldmail.com",
+                rec_count: 2,
+            }
+
+            var subscriber2 = {
+                email: "sam@pmail.co",
+                rec_count: 16,
+            }
+
+            var subscriber3 = {
+                email: "linda1989@oal.com",
+                rec_count: 1,
+            }
+
+            var subscriber4 = {
+                email: "jan1940@ahoy.com",
+                rec_count: 0,
+            }
+
+            var subscriber5 = {
+                email: "mrbig@pmail.co",
+                rec_count: 25,
+            }
+
+            var subscriber6 = {
+                email: "lol@lol.lol",
+                rec_count: 0,
+            }
+
+            /**
+             * 쿠폰 데이터
+             *  - code : 코드
+             *  - rank : 등급
+             */
+            var coupon1 = {
+                code: "MAYDISCOUNT",
+                rank: "good",
+            }
+
+            var coupon2 = {
+                code: "10PERCENT",
+                rank: "bad",
+            }
+
+            var coupon3 = {
+                code: "PROMOTION45",
+                rank: "best",
+            }
+
+            var coupon4 = {
+                code: "IHEARTYOU",
+                rank: "bad",
+            }
+
+            var coupon5 = {
+                code: "GETADEAL",
+                rank: "best",
+            }
+
+            var coupon6 = {
+                code: "ILIKEDISCOUNTS",
+                rank: "good",
+            }
+
+            /**
+             * 쿠폰 등급
+             */
+            var BestRank = "best";
+            var GoodRank = "good";
+
+            // 계산
+            /**
+             * 특정 등급의 쿠폰 목록을 선택하는 함수
+             */
+            function selectCouponsByRank(coupons, rank) {
+                var ret = [];
+                for (var c = 0; c < coupons.length; c++) {
+                    var coupon = coupons[c];
+                    if (coupon.rank === rank)
+                        ret.push(coupon.code);
+                }
+                return ret;
+            }
+
+            // 계산
+            /**
+             * 쿠폰 등급 결정 함수
+             *  - 구독자가 어떤 쿠폰 등급을 가질 수 있는지 확인하는 함수
+             */
+            function subCouponRank(subscriber) {
+                if (subscriber.rec_count >= 10)
+                    return "best";
+                else
+                    return "good";
+            }
+
+            // 계산
+            /**
+             * 구독자가 받을 이메일 만들기(단건)
+             */
+            function emailForSubscriber(subscriber, goods, bests) {
+                var rank = subCouponRank(subscriber);
+                if (rank === "best")
+                    return {
+                        from: "newsletter@coupondog.co",
+                        to: subscriber.email,
+                        subject: "Your best weekly coupons inside",
+                        body: "Here are your best coupons: " + bests.join(", "),
+                    }
+                else
+                    return {
+                        from: "newsletter@coupondog.co",
+                        to: subscriber.email,
+                        subject: "Your good weekly coupons inside",
+                        body: "Here are your good coupons: " + goods.join(", "),
+                    }
+            }
+
+            // 계산
+            /**
+             * 보낼 이메일 목록 만들기
+             */
+            function emailsForSubscribers(subscribers, goods, bests) {
+                var emails = [];
+                for(var s = 0; s < subscribers.length; s++) {
+                    var subscriber = subscribers[s];
+                    var email = emailForSubscriber(subscriber, goods, bests);
+                    emails.push(email);
+                }
+                return emails;
+            }
+
+            // 액션
+            function fetchSubscribersFromDB() {
+                return [subscriber1, subscriber2, subscriber3, subscriber4, subscriber5, subscriber6];
+            }
+
+            // 액션
+            function fetchCouponsFromDB() {
+                return [coupon1, coupon2, coupon3, coupon4, coupon5, coupon6];
+            }
+
+            /**
+             * 이메일 보내기
+             */
+            var emailSystem = {
+                send: function (email) {
+                    console.log("===========")
+                    console.log(`보낸이 : ${email.from}`)
+                    console.log(`받는이 : ${email.to}`)
+                    console.log(`제목 : ${email.subject}`)
+                    console.log(`내용 : ${email.body}`)
+                }
+            }
+
+            /**
+             * 이메일 샘플
+             */
+            var message = {
+                from: "newsletter@coupondog.co",
+                to: "sam@pmail.com",
+                subject: "Your weekly coupons inside",
+                body: "Here are your coupons ...",
+            }
+
+            // 액션들의 묶음도 액션
+            function sendIssue() {
+                var subscribers = fetchSubscribersFromDB(); // 액션
+
+                var coupons = fetchCouponsFromDB(); // 액션
+                var bestCoupons = selectCouponsByRank(coupons, BestRank); // 계산
+                var goodCoupons = selectCouponsByRank(coupons, GoodRank); // 계산
+
+                var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산
+
+                for (var e = 0; e < emails.length; e++) {
+                    var email = emails[e];
+                    emailSystem.send(email); // 액션
+                }
+            }
+
+            sendIssue(); // 결과 성공
+        </script>
+    </body>
+</html>
