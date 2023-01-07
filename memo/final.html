@@ -190,30 +190,113 @@
                 body: "Here are your coupons ...",
             }
 
+            // coupons adapter
             // 액션들의 묶음도 액션
             function sendIssue() {
                 var page = 0;
-                var subscribers = fetchSubscribersFromDB(page); // 액션
+                var subscribers = fetchSubscribersFromDB(page); // 액션, subscriber usecase
 
-                var coupons = fetchCouponsFromDB(); // 액션
-                var bestCoupons = selectCouponsByRank(coupons, BestRank); // 계산
-                var goodCoupons = selectCouponsByRank(coupons, GoodRank); // 계산
+                var coupons = fetchCouponsFromDB(); // 액션, coupons usecase
+                var bestCoupons = selectCouponsByRank(coupons, BestRank); // 계산, coupons usecase
+                var goodCoupons = selectCouponsByRank(coupons, GoodRank); // 계산, coupons usecase
 
                 while (subscribers.length > 0) {
-                    var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산
+                    var emails = emailsForSubscribers(subscribers, goodCoupons, bestCoupons); // 계산, coupons usecase
 
                     for (var e = 0; e < emails.length; e++) {
                         var email = emails[e];
-                        emailSystem.send(email); // 액션
+                        emailSystem.send(email); // 액션, email usecase
                     }
 
                     page++;
-                    subscribers = fetchSubscribersFromDB(page);
-                    console.log(subscribers)
+                    subscribers = fetchSubscribersFromDB(page); // subscriber usecase
                 }
             }
 
+            // main
             sendIssue(); // 결과 성공
+        </script>
+        <script>
+            var shopping_cart = []; // 액션
+
+            function add_item_to_cart(name, price) {
+                var item = make_cart_item(name, price);
+                shopping_cart = add_item(shopping_cart, item);
+
+                var total = calc_total(shopping_cart);
+                set_cart_total_dom(total); // 액션
+                update_shipping_icons(shopping_cart); // 액션, 암묵적 입력
+                update_tax_dom(total); // 액션, 암묵적 입력
+            }
+
+            // 계산
+            // cart
+            function add_item(cart, item) {
+                return add_element_last(cart, item);
+            }
+
+            // 계산
+            // array
+            function add_element_last(array, elem) {
+                var array_copy = array.slice();
+                array_copy.push(elem);
+                return array_copy;
+            }
+
+            // 계산
+            // item
+            function make_cart_item(name, price) {
+                return {
+                    name: name,
+                    price: price,
+                }
+            }
+
+            // 카트 총액 보여주기
+            function set_cart_total_dom(total) {
+                console.log(total)
+            }
+
+            // 계산
+            // cart, item, 비즈니스 규칙
+            function calc_total(cart) {
+                var total = 0;
+                for (var i = 0; i < cart.length; i++) {
+                    var item = cart[i];
+                    total += item.price;
+                }
+                return total;
+            }
+
+            function update_shipping_icons(cart) {
+                var buy_buttons = get_buy_buttons_dom(); // 액션, 암묵적 입력
+                for(var i = 0; i < buy_buttons.length; i++) {
+                    var button = buy_buttons[i];
+                    var item = button.item;
+
+                    var new_cart = add_item(cart, item.name, item.price);
+
+                    if (gets_free_shipping(new_cart))
+                        button.show_free_shipping_icon(); // 액션, 암묵적 출력
+                    else
+                        button.hide_free_shipping_icon(); // 액션, 암묵적 출력
+                }
+            }
+
+            // 비즈니스 규칙
+            function gets_free_shipping(cart) {
+                return calc_total(cart) >= 20
+            }
+
+            function update_tax_dom(total) {
+                set_tax_dom(calc_tax(total));  // 액션, 암묵적 출력
+            }
+
+            // 계산
+            // 비즈니스 규칙
+            function calc_tax(total) {
+                return total * 0.10
+            }
         </script>
     </body>
 </html>
