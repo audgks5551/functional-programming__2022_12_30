@@ -217,7 +217,24 @@
             sendIssue(); // 결과 성공
         </script>
         <script>
-            var shopping_cart = []; // 액션
+            var shopping_cart = [
+                {
+                    name: "shoes",
+                    price: 10
+                },
+                {
+                    name: "socks",
+                    price: 3
+                },
+                {
+                    name: "pants",
+                    price: 27
+                },
+                {
+                    name: "t-shirt",
+                    price: 7
+                },
+            ]; // 액션
 
             function add_item_to_cart(name, price) {
                 var item = make_cart_item(name, price);
@@ -227,6 +244,25 @@
                 set_cart_total_dom(total); // 액션
                 update_shipping_icons(shopping_cart); // 액션, 암묵적 입력
                 update_tax_dom(total); // 액션, 암묵적 입력
+
+                /**
+                 * 깊은 복사, 방어적 복사
+                 */
+                shopping_cart = black_friday_promotion_safe(shopping_cart);
+            }
+
+            // 액션
+            // cart
+            function black_friday_promotion_safe(cart) {
+                var cart_copy = deepCopy(cart);
+                black_friday_promotion(cart_copy);
+                return deepCopy(cart_copy);
+            }
+
+            // 액션
+            function black_friday_promotion(cart) {
+                // 라이브러리라고 생각하고 이 함수는 제공되므로 고칠 수 없다고 가정
+                // ...
             }
 
             // 계산
@@ -296,6 +332,224 @@
             // 비즈니스 규칙
             function calc_tax(total) {
                 return total * 0.10
+            }
+
+            // 계산
+            // cart
+            function remove_item_by_name(cart, name) {
+                var idx = null;
+                for (var i = 0; i < cart.length; i++) {
+                    if (cart[i].name === name)
+                        idx = i;
+                }
+
+                if (idx !== null)
+                    return removeItems(cart, idx, 1);
+
+                return cart;
+            }
+
+            // 액션
+            function delete_handler(name) {
+                shopping_cart = remove_item_by_name(shopping_cart, name);
+                var total = calc_total(shopping_cart);
+                set_cart_total_dom(total);
+                update_shipping_icons(shopping_cart);
+                update_tax_dom(total);
+            }
+
+            // 계산
+            // array
+            function removeItems(array, idx, count) {
+                var copy = array.slice();
+                copy.splice(idx, count);
+                return copy;
+            }
+
+            // 계산
+            // array
+            function arraySet(array, idx, value) {
+                var array_copy = array.slice();
+                array_copy[idx] = value;
+                return array_copy;
+            }
+
+            // 계산
+            // object
+            function objectSet(object, key, value) {
+                var object_copy = Object.assign({}, object);
+                object_copy[key] = value;
+                return object_copy;
+            }
+
+            // 계산
+            // item
+            function setPrice(item, new_price) {
+                return objectSet(item, "price", new_price);
+            }
+
+            // 계산
+            // item
+            function setQuantity(item, new_quantity) {
+                return objectSet(item, "quantity", new_quantity);
+            }
+
+            // 계산
+            // object
+            function objectDelete(object, key) {
+                var object_copy = Object.assign({}, object);
+                delete object_copy[key];
+                return object_copy;
+            }
+
+            // 계산
+            // cart, item
+            function setPriceByName(cart, name, price) {
+                var cart_copy = cart.slice();
+                for (var i = 0; i < cart_copy.length; i++) {
+                    var item = cart_copy[i];
+                    if (item.name === name)
+                        cart_copy[i] = setPrice(item, price);
+                }
+                return cart_copy;
+            }
+
+            // 계산
+            // cart, item
+            function setQuantityByName(cart, name, quantity) {
+                var cart_copy = cart.slice();
+                for (var i = 0; i < cart_copy.length; i++) {
+                    var item = cart_copy[i];
+                    if (item.name === name)
+                        cart_copy[i] = setQuantity(item, quantity);
+                }
+                return cart_copy;
+            }
+        </script>
+        <script>
+            var mailing_list = [];
+
+            // 계산
+            // email
+            function add_contact(list, email) {
+                return push(list, email);
+            }
+
+            // 액션
+            function submit_form_handler(event) {
+                var form = event.target;
+                var email = form.elements["email"].value;
+                mailing_list = add_contact(mailing_list, email);
+            }
+
+            // 계산
+            // array
+            function first_element(array) {
+                return array[0];
+            }
+
+            // 계산
+            // array
+            function drop_first(array) {
+                var array_copy = array.slice();
+                array_copy.shift();
+                return array_copy;
+            }
+
+            // 계산
+            // array
+            function shift(array) {
+                var array_copy = array.slice();
+                var first = array_copy.shift();
+                return {
+                    first: first,
+                    array: array_copy,
+                };
+            }
+
+            // 계산
+            // array
+            function new_shift(array) {
+                return {
+                    first: first_element(array),
+                    array: drop_first(array),
+                }
+            }
+
+            // 계산
+            // array
+            function last_element(array) {
+                return array[array.length - 1];
+            }
+
+            // 계산
+            // array
+            function drop_last_element(array) {
+                var array_copy = array.slice();
+                array_copy.pop();
+                return array_copy;
+            }
+
+            // 계산
+            // array
+            function pop(array) {
+                var array_copy = array.slice();
+                var first = array_copy.pop();
+                return {
+                    first: first,
+                    array: array_copy,
+                }
+            }
+
+            // 계산
+            // array
+            function push(array, elem) {
+                var array_copy = array.slice();
+                array_copy.push(elem);
+                return array_copy;
+            }
+        </script>
+        <script>
+            userChanges.subscribe(function (user) {
+                var user_copy = deepCopy(user);
+                processUser(user_copy);
+            });
+
+            // 액션
+            function payrollCalc(employees) {
+                // 라이브러리라고 생각하고 이 함수는 제공되므로 고칠 수 없다고 가정
+                // ...
+                return payrollChecks;
+            }
+
+            // 액션
+            function payrollCalcSafe(employees) {
+                var employees_copy = deepCopy(employees);
+                var payrollChecks = payrollCalc(employees_copy);
+                return deepCopy(payrollChecks);
+            }
+
+            // 재귀 함수
+            // Lodash 라이브러리를 쓰는 것을 추천
+            // object, array
+            function deepCopy(thing) {
+                if (Array.isArray(thing)) {
+                    var copy = [];
+                    for (var i = 0; i < thing.length; i++)
+                        copy.push(deepCopy(thing[i]));
+                } else if (thing === null) {
+                    return null;
+                } else if (typeof thing === "object") {
+                    var copy = {};
+                    var keys = Object.keys(thing);
+                    for (var i = 0; i < keys.length; i++) {
+                        var key = keys[i];
+                        copy[key] = deepCopy(thing[key]);
+                    }
+                    return copy;
+                } else {
+                    return thing;
+                }
             }
         </script>
     </body>
