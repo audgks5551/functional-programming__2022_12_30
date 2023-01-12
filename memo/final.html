@@ -369,62 +369,102 @@
             // 계산
             // array
             function arraySet(array, idx, value) {
-                var array_copy = array.slice();
-                array_copy[idx] = value;
-                return array_copy;
+                return withArrayCopy(
+                    array,
+                    function (array_copy) {
+                        array_copy[idx] = value;
+                    });
             }
 
             // 계산
             // object
             function objectSet(object, key, value) {
+                return withObjectCopy(object, function (object_copy) {
+                    object_copy[key] = value;
+                });
+            }
+
+            function withObjectCopy(object, modify) {
                 var object_copy = Object.assign({}, object);
-                object_copy[key] = value;
+                modify(object_copy);
                 return object_copy;
-            }
-
-            // 계산
-            // item
-            function setPrice(item, new_price) {
-                return objectSet(item, "price", new_price);
-            }
-
-            // 계산
-            // item
-            function setQuantity(item, new_quantity) {
-                return objectSet(item, "quantity", new_quantity);
             }
 
             // 계산
             // object
             function objectDelete(object, key) {
-                var object_copy = Object.assign({}, object);
-                delete object_copy[key];
-                return object_copy;
+                return withObjectCopy(object, function (object_copy) {
+                    delete object_copy[key];
+                });
             }
 
-            // 계산
-            // cart, item
+            /*
+            function setQuantity(item, new_quantity) {
+                return objectSet(item, "quantity", new_quantity);
+            }
+
+            function setPrice(item, new_price) {
+                return objectSet(item, "price", new_price);
+            }
+
             function setPriceByName(cart, name, price) {
-                var cart_copy = cart.slice();
-                for (var i = 0; i < cart_copy.length; i++) {
-                    var item = cart_copy[i];
-                    if (item.name === name)
-                        cart_copy[i] = setPrice(item, price);
-                }
-                return cart_copy;
+                var item = cart[name];
+                var newItem = objectSet(item, 'price', price);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
             }
 
-            // 계산
-            // cart, item
             function setQuantityByName(cart, name, quantity) {
-                var cart_copy = cart.slice();
-                for (var i = 0; i < cart_copy.length; i++) {
-                    var item = cart_copy[i];
-                    if (item.name === name)
-                        cart_copy[i] = setQuantity(item, quantity);
-                }
-                return cart_copy;
+                var item = cart[name];
+                var newItem = objectSet(item, 'quantity', quantity);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
             }
+
+            function setShippingByName(cart, name, ship) {
+                var item = cart[name];
+                var newItem = objectSet(item, 'shipping', ship);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
+            }
+            */
+
+            // 위에 함수들을 1개의 함수로 통합
+            // 계산
+            // cart
+            function setFieldByName(cart, name, field, value) {
+                if (!validItemFields.includes(field)) {
+                    throw `Not a valid item field: '${field}'.`
+                }
+
+                if (translations.hasOwnProperty(field))
+                    field = translations[field];
+
+                var item = cart[name];
+                var newItem = objectSet(item, field, value);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
+            }
+
+            var validItemFields = ['price', 'quantity', 'shipping', 'tax'];
+            var translations = { 'quantity': 'number'};
+
+            function withArrayCopy(array, modify) {
+                var array_copy = array.slice();
+                modify(array_copy);
+                return array_copy;
+            }
+
+            var array = ['하나', '둘', '셋'];
+            var SuperSorter = {
+                sort: function (array_copy) {
+                    console.log("엄청 빠른 정렬하기")
+                }
+            }
+
+            var sortedArray = withArrayCopy(array, function (array_copy) {
+                SuperSorter.sort(array_copy);
+            });
         </script>
         <script>
             var mailing_list = [];
@@ -451,9 +491,9 @@
             // 계산
             // array
             function drop_first(array) {
-                var array_copy = array.slice();
-                array_copy.shift();
-                return array_copy;
+                return withArrayCopy(array, function (copy) {
+                    copy.shift();
+                });
             }
 
             // 계산
@@ -485,9 +525,9 @@
             // 계산
             // array
             function drop_last_element(array) {
-                var array_copy = array.slice();
-                array_copy.pop();
-                return array_copy;
+                return withArrayCopy(array, function (copy) {
+                    copy.pop();
+                })
             }
 
             // 계산
@@ -504,9 +544,9 @@
             // 계산
             // array
             function push(array, elem) {
-                var array_copy = array.slice();
-                array_copy.push(elem);
-                return array_copy;
+                return withArrayCopy(array, function (copy) {
+                    copy.push(elem);
+                });
             }
         </script>
         <script>
@@ -549,6 +589,230 @@
                     return copy;
                 } else {
                     return thing;
+                }
+            }
+        </script>
+        <script>
+            /*
+            function multiplyByFour(x) {
+                return x * 4;
+            }
+
+            function multiplyBy12(x) {
+                return x * 12;
+            }
+
+            function multiplyBySix(x) {
+                return x * 6;
+            }
+
+            function multiplyByPi(x) {
+                return x * 3.14159;
+            }
+            */
+
+            // 위의 함수들을 1개의 함수로 통합
+            function multiply(x, y) {
+                return x * y;
+            }
+
+            /*
+            function incrementQuantityByName(cart, name) {
+                var item = cart[name];
+                var quantity = item['quantity'];
+                var newQuantity = quantity + 1;
+                var newItem = objectSet(item, 'quantity', newQuantity);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
+            }
+
+            function incrementSizeByName(cart, name) {
+                var item = cart[name];
+                var size = item['size'];
+                var newSize = size + 1;
+                var newItem = objectSet(item, 'size', newSize);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
+            }
+            */
+
+            // 위의 함수들을 1개의 함수로 통합
+            function incrementFieldByName(cart, name, field) {
+                if (!validIncrementItemFields.includes(field)) {
+                    throw `증가 시킬 수 없는 필드: '${field}'.`
+                }
+
+                var item = cart[name];
+                var value = item[field];
+                var newValue = value + 1;
+                var newItem = objectSet(item, field, newValue);
+                var newCart = objectSet(cart, name, newItem);
+                return newCart;
+            }
+
+            var validIncrementItemFields = ['price', 'quantity'];
+        </script>
+        <script>
+            function plus(a, b) {
+                return a + b;
+            }
+
+            function minus(a, b) {
+                return a - b;
+            }
+
+            function times(a, b) {
+                return a * b;
+            }
+
+            function divideBy(a, b) {
+                return a / b;
+            }
+        </script>
+        <script>
+            var foods = ['닭갈비', '피자'];
+            var dishes = ['큰 접시', '작은 접시'];
+
+            function cook(food) {
+                console.log(`${food}를 요리합니다`);
+            }
+
+            function eat(food) {
+                console.log(`${food}를 먹습니다`);
+            }
+
+            function wash(dish) {
+                console.log(`${dish}를 닦는다`)
+            }
+
+            function dry(dish) {
+                console.log(`${dish}를 말린다`)
+            }
+
+            function putAway(dish) {
+                console.log(`${dish}를 치우다`)
+            }
+
+            /*
+            function cookAndEatArray(array) {
+                for (var i = 0; i < array.length; i++) {
+                    var item = array[i];
+                    cookAndEat(item);
+                }
+            }
+
+            function cleanArray(array) {
+                for (var i = 0; i < array.length; i++) {
+                    var item = array[i];
+                    clean(item);
+                }
+            }
+            */
+
+            // 위의 함수를 하나로 통합
+            function forEach(array, f) {
+                for (var i = 0; i < array.length; i++) {
+                    var item = array[i];
+                    f(item);
+                }
+            }
+
+            function cookAndEat(food) {
+                cook(food);
+                eat(food);
+            }
+
+            function clean(dish) {
+                wash(dish);
+                dry(dish);
+                putAway(dish);
+            }
+
+            forEach(foods, function (food) {
+                cook(food);
+                eat(food);
+            });
+
+            forEach(dishes, function (dish) {
+                wash(dish);
+                dry(dish);
+                putAway(dish);
+            });
+
+            function logToSnapErrors(error) {
+                console.log(error);
+            }
+
+            function saveUserDataWithLogging(user) {
+                try {
+                    saveUserDataNoLogging(user);
+                } catch (error) {
+                    logToSnapErrors(error);
+                }
+            }
+
+            function warpLogging(f) {
+                return function (a1, a2, a3, a4, a5, a6, a7, a8, a9) {
+                    try {
+                        return f(a1, a2, a3, a4, a5, a6, a7, a8, a9);
+                    } catch (error) {
+                        logToSnapErrors(error);
+                    }
+                }
+            }
+
+            function saveUserDataNoLogging(user) {
+                console.log(`${user}를 저장합니다.`);
+            }
+
+            var user = {
+                name: "mark",
+                age: 28,
+            }
+
+            function tryCatch(f, errorHandler) {
+                try {
+                    f();
+                } catch (error) {
+                    errorHandler(error);
+                }
+            }
+
+            tryCatch(function () {
+                saveUserDataNoLogging(user);
+            }, logToSnapErrors);
+
+            function when(test, then, ELSE) {
+                if (test) {
+                    return then();
+                } else {
+                    return ELSE();
+                }
+            }
+
+            when(array.length === 0,
+                function () {
+                    console.log("Array is empty");
+                },
+                function () {
+                    console.log("Array has something in it");
+                });
+
+            var saveUserWithLogging = warpLogging(saveUserDataNoLogging);
+
+            function withLoggingNotCatch(f) {
+                return function (a1, a2, a3) {
+                    try {
+                        return f(a1, a2, a3, a4, a5, a6, a7, a8, a9);
+                    } catch (error) {
+                        return null;
+                    }
+                }
+            }
+
+            function makeAdder(incrementNumber) {
+                return function (number) {
+                    return number + incrementNumber;
                 }
             }
         </script>
